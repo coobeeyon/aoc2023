@@ -65,7 +65,31 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let all_numbers = input
+        .lines()
+        .enumerate()
+        .flat_map(|(i, s)| find_numbers(s).into_iter().map(move |l| (i, l)))
+        .collect_vec();
+    let all_symbols = input
+        .lines()
+        .enumerate()
+        .flat_map(|(i, s)| find_symbols(s).into_iter().map(move |l| (i, l)))
+        .collect_vec();
+    let symbol_numbers = all_symbols.into_iter().map(|s| {
+        all_numbers
+            .iter()
+            .filter(|&n| next_to_symbol(n, &s))
+            .collect_vec()
+    });
+    let gears = symbol_numbers
+        .into_iter()
+        .filter(|numbers| numbers.len() == 2)
+        .collect_vec();
+    let sum = gears
+        .into_iter()
+        .map(|v| v.into_iter().fold(1, |a, (_, (n, _))| a * n))
+        .sum();
+    Some(sum)
 }
 
 #[cfg(test)]
@@ -81,6 +105,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(467835));
     }
 }
