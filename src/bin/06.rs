@@ -2,7 +2,7 @@ use itertools::Itertools;
 
 advent_of_code::solution!(6);
 
-fn race_distances(time: u32) -> impl Iterator<Item = u32> {
+fn race_distances(time: u64) -> impl Iterator<Item = u64> {
     (0..time).map(move |charge_time| {
         let v = charge_time;
         v * (time - charge_time)
@@ -14,7 +14,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         .lines()
         .map(|s| {
             s.split(' ')
-                .filter_map(|s| s.parse::<u32>().ok())
+                .filter_map(|s| s.parse::<u64>().ok())
                 .collect_vec()
         })
         .collect_vec();
@@ -34,8 +34,19 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(winning_races.into_iter().product())
 }
 
-pub fn part_two(_input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<u32> {
+    let vals = input
+        .lines()
+        .filter_map(|s| {
+            s.chars()
+                .filter(|c| c.is_ascii_digit())
+                .collect::<String>()
+                .parse::<u64>()
+                .ok()
+        })
+        .collect_vec();
+    let (time, distance) = (vals[0], vals[1]);
+    Some(race_distances(time).filter(|d| *d > distance).count() as u32)
 }
 
 #[cfg(test)]
@@ -51,6 +62,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(71503));
     }
 }
